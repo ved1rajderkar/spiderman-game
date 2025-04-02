@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="A Simple Spiderman Game in HTML5, CSS3 and Javascript" />
+    <meta name="author" content="Chandula Janith (RedEdge967)" />
+    <title>Spider-Man Game | A spiderman game to fight with more Villains of Spider-Man</title>
+    <link rel="shortcut icon" href="images/spider-head.png" />
+</head>
+<style type="text/css">
+    html,
+    body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        font-size: 0;
+        background: #000;
+    }
+
+    .canvas-wrapper {
+        float: left;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        -moz-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        -o-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        background: #000;
+    }
+
+    .key {
+        height: 30px;
+        min-width: 20px;
+        line-height: 30px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-bottom: 3px solid #bbb;
+        background: white;
+        display: inline-block;
+        padding: 0 5px;
+        border-radius: 5px;
+        box-shadow: inset 0 -1px 0 #ccc;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .key.spacebar {
+        padding: 0 40px;
+    }
+
+    .keyboard {
+        margin: 5px 0;
+        font-size: 15px;
+        font-family: Helvetica;
+        color: white;
+    }
+
+    .action {
+        margin-right: 15px;
+    }
+
+    .link {
+        width: 100%;
+        text-align: center;
+        font-size: 20px;
+        color: #ccc;
+        font-family: SpidermanGamePixelFont, Helvetica, Arial;
+        margin-top: 20px;
+        cursor: pointer; /* Add cursor pointer for better UX */
+    }
+
+    canvas:fullscreen {
+        object-fit: contain;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: black; /* Add black bars */
+    }
+
+    .canvas-wrapper:fullscreen {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: black;
+    }
+
+    /* Fix menu positioning for fullscreen */
+    .spiderman-game-menu-container {
+        position: fixed;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        transform: translate(-50%, -50%);
+    }
+
+    /* Ensure menus are visible in fullscreen */
+    .canvas-wrapper:fullscreen .spiderman-game-menu-container {
+        position: fixed;
+        z-index: 10000;
+    }
+
+    /* Style menu elements */
+    .spiderman-game-menu-title {
+        color: white;
+        font-family: SpidermanGamePixelFont, Helvetica, Arial;
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+
+    .spiderman-game-menu-button {
+        color: white;
+        font-family: SpidermanGamePixelFont, Helvetica, Arial;
+        font-size: 20px;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin: 5px 0;
+    }
+
+    .spiderman-game-menu-button:hover {
+        color: #ff0000;
+    }
+
+    .spiderman-game-menu-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        transform: translate(-50%, -50%);
+        min-width: 200px;
+    }
+
+    .canvas-wrapper:fullscreen .spiderman-game-menu-container {
+        position: fixed;
+        z-index: 10000;
+    }
+
+    .keyboard:fullscreen {
+        display: none; /* Hide controls in fullscreen */
+    }
+
+    /* Mobile Controls */
+    .mobile-controls {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        z-index: 1000;
+        pointer-events: auto;
+    }
+
+    .d-pad {
+        position: fixed;
+        left: 20px;
+        bottom: 20px;
+        width: 150px;
+        height: 150px;
+    }
+
+    .d-pad-btn {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.4);
+        border: 3px solid white;
+        border-radius: 50%;
+        color: white;
+        font-size: 28px;
+        touch-action: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .action-btn {
+        position: fixed;
+        right: 30px;
+        bottom: 40px;
+        width: 90px;
+        height: 90px;
+        background: rgba(255, 0, 0, 0.4);
+        border: 3px solid red;
+        border-radius: 50%;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        touch-action: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Make buttons more visible when pressed */
+    .d-pad-btn:active,
+    .action-btn:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+    }
+
+    /* Show mobile controls only on touch devices */
+    @media (hover: none) and (pointer: coarse) {
+        .mobile-controls {
+            display: block;
+        }
+        .keyboard {
+            display: none;
+        }
+    }
+
+    /* Keep mobile controls visible in fullscreen on mobile */
+    .canvas-wrapper:fullscreen .mobile-controls {
+        display: block;
+    }
+</style>
+<body>
+    <div class="link" id="fullscreen-button">Toggle Fullscreen</div>
+    <div class="canvas-wrapper">
+        <div class="keyboard">
+            <div class="key spacebar">Spacebar</div>
+            <span class="action">- Shoot</span>
+
+            <div class="key">←</div>
+            <div class="key">→</div>
+            <span class="action">- Left/Right</span>
+
+            <div class="key">↑</div>
+            <span class="action">- Jump</span>
+
+            <div class="key">Esc</div>
+            <span class="action">- Pause</span>
+        </div>
+        <canvas id="canvas"></canvas>
+        
+        <!-- Replace the existing mobile controls div with this -->
+        <div class="mobile-controls">
+            <div class="d-pad">
+                <div class="d-pad-btn" id="leftBtn">←</div>
+                <div class="d-pad-btn" id="rightBtn">→</div>
+                <div class="d-pad-btn" id="jumpBtn">↑</div>
+                <div class="d-pad-btn" id="pauseBtn">Esc</div>
+                <div class="d-pad-btn" id="shootBtn">SHOOT</div>
+            </div>
+            <button class="action-btn shoot" id="shoot-btn">SHOOT</button>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="spiderman-game.js"></script>
+<script type="text/javascript">
+    var game = new SpidermanGame({
+        canvas: "#canvas"
+    });
+    game.load();
+</script>
+</html>
